@@ -319,7 +319,7 @@ void enum_passwd_policy(char *s) {
 	mbstowcs(server,serv,1024);
 	
 	level = 0;  
-	if ((ret = NetUserModalsGet(server,level,(BYTE **)&buf0)) != NERR_Success) {
+	if ((ret = NetUserModalsGet((wchar_t*)server,level,(BYTE **)&buf0)) != NERR_Success) {
 		printf("couldn't get password policy\n");
 		describe(ret);
 	} else {
@@ -378,7 +378,7 @@ void enum_shares(char *s, int d) {
 	do {
 		printf("enumerating shares (pass %d)... ",pass);
 
-		ret = NetShareEnum((char*)wserver,level,(unsigned char **)&buff,prefmaxlen,
+		ret = NetShareEnum((wchar_t *)wserver,level,(unsigned char **)&buff,prefmaxlen,
 			               &read,&total,&resume);
 
 		resume = total-(total-read); // NetShareEnum is borked
@@ -541,7 +541,7 @@ void enum_lsa(char *s) {
 		pass++;
 	} while ((err != ERROR_NO_MORE_ITEMS) && (err != 0x8000001a)); 
 
-	if (NetUserModalsGet((const unsigned short *)&wserver,1,(unsigned char **)&buff) == NERR_Success) {
+	if (NetUserModalsGet((wchar_t *)&wserver,1,(unsigned char **)&buff) == NERR_Success) {
 		PUSER_MODALS_INFO_1 info = (PUSER_MODALS_INFO_1)buff;
 
 		if (wcslen(info->usrmod1_primary)) 
@@ -758,7 +758,7 @@ void enum_groups(char *s, int d) {
 			printf("Group: %S\n",info[i].lgrpi0_name);
 
 			DWORD ret, read, total, resume = 0;
-			ret = NetLocalGroupGetMembers((const unsigned short*)&wserver, info[i].lgrpi0_name, 3, 
+			ret = NetLocalGroupGetMembers((wchar_t *)&wserver, info[i].lgrpi0_name, 3, 
 				                          (unsigned char **)&buff, 1024, &read, &total, &resume);
 
 			if (ret != NERR_Success && ret != ERROR_MORE_DATA) {
